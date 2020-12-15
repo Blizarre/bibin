@@ -1,6 +1,6 @@
 [package]
 name = "bibin"
-version = "1.1.5"
+version = "1.1.6"
 description = "a paste bin."
 repository = "https://github.com/w4/bin"
 license = "WTFPL OR 0BSD"
