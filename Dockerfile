@@ -1,5 +1,5 @@
 FROM rust:1-slim-bullseye AS builder
-RUN rustup install stable-x86_64-unknown-linux-gnu
+RUN rustup toolchain install stable-x86_64-unknown-linux-gnu
 RUN rustup default stable
 
 RUN apt-get update && apt-get install -y libclang-dev
