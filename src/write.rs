@@ -140,3 +140,49 @@ pub async fn delete(
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use crate::io::{get_all_paste, ReadPool};
+    use crate::rocket;
+    use rocket::http::{Header, Status};
+
+    use super::{rocket_uri_macro_delete, rocket_uri_macro_submit};
+
+    use crate::test::{create_test_client, PASSWORD};
+
+    const ENTRY_CONTENT: &str = "This is a test";
+
+    #[rocket::async_test]
+    async fn test_simple_case() {
+        let (_temp, client) = create_test_client().await;
+        let read_pool = client.rocket().state::<ReadPool>().unwrap();
+
+        let response = client
+            .put(uri!(submit()))
+            .body(ENTRY_CONTENT)
+            .header(Header::new("X-API-Key", PASSWORD))
+            .dispatch()
+            .await;
+
+        assert_eq!(response.status(), Status::Ok);
+        let mut all_paste = get_all_paste(read_pool).await.unwrap();
+        assert_eq!(all_paste.len(), 1);
+        let the_paste = all_paste.pop().unwrap();
+        assert_eq!(the_paste.1, ENTRY_CONTENT);
+        let paste_id = the_paste.0;
+
+        let response = response.into_string().await.unwrap();
+        assert!(response.contains(&paste_id));
+
+        let response = client
+            .delete(uri!(delete(&paste_id)))
+            .body(ENTRY_CONTENT)
+            .header(Header::new("X-API-Key", PASSWORD))
+            .dispatch()
+            .await;
+        assert_eq!(response.status(), Status::Ok);
+
+        assert_eq!(get_all_paste(read_pool).await.unwrap().len(), 0);
+    }
+}
