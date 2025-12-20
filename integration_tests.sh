@@ -30,18 +30,18 @@ trap exit_script EXIT
 type=${1-full}
 
 prefix=http://localhost:8000
-password=a69711b1-3d39-4344-b97a-ba91e2f5adca
+password=delimiter3
 browser_agent="Mozilla/5.0 (X11; Linux x86_64; rv:76.0) Gecko/20100101 Firefox/76.0"
 
 DB_FILE=tests.db
 rm -f "$DB_FILE"{,-shm,-wal}
 env "ROCKET_SECRET_KEY=jhqTG1chy13SzpyT1whkK+oIpfmN+RQRzA60DxkTG64="\
-    "ROCKET_PASSWORD=$password"\
+    "ROCKET_PASSWORD_HASH=\$argon2id\$v=19\$m=19456,t=2,p=1\$8UejUJOkJFwAYhlotVYv5A\$SmVAPeWAChwch78ooZu9zTmhskiijez2tZ9P2cDmnXI"\
     "ROCKET_MAX_ENTRIES"=10000\
     "ROCKET_ID_LENGTH"=4\
     "ROCKET_DATABASE_FILE=$DB_FILE"\
     "ROCKET_PREFIX=$prefix"\
-    cargo run --release&
+    cargo run --release --bin bibin&
 
 bibin_pid=$!
 

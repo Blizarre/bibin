@@ -17,7 +17,7 @@ At startup it will read each key from a `Rocket.toml` file, or from environment 
 
 ```
 [default]
-password = "YOUR_PASSWORD"
+password_hash = "OUTPUT OF cargo run --bin bibin_pwd_hash"
 prefix = "https://YOUR.WEBSITE.net"
 secret_key = "REPLACE WITH THE OUTPUT OF openssl rand -base64 32"
 ```

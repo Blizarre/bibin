@@ -105,3 +105,66 @@ async fn rocket() -> rocket::Rocket<rocket::Build> {
     .manage(read_pool)
     .manage(write_pool)
 }
+
+#[cfg(test)]
+pub mod test {
+    use crate::config::BibinConfig;
+    use crate::highlight::Highlighter;
+    use crate::io::{ReadPool, WritePool};
+    use crate::rocket;
+    use rocket::local::asynchronous::Client;
+    use tempfile::NamedTempFile;
+
+    use crate::get::{all_entries, get_item, get_item_raw, get_qr, index};
+    use crate::write::{delete, submit, submit_raw, submit_raw_with_key};
+
+    pub const PASSWORD: &str = "password123";
+    pub const PASSWORD_HASH: &str = "$argon2id$v=19$m=19456,t=2,p=1$PtF+PwbhZkXXMytQXH/8FQ$X5h9fRlI4Wmutwmy9NHEijsnjqrofBaosZLrjBSCvd4";
+
+    pub async fn create_test_client() -> (NamedTempFile, Client) {
+        let temp = NamedTempFile::new().unwrap();
+        let file_name = temp.path().to_str().unwrap();
+        let write_pool = WritePool::new(file_name)
+            .await
+            .expect("Error when creating the writing pool");
+
+        write_pool
+            .init()
+            .await
+            .expect("Error during initialization");
+
+        let read_pool = ReadPool::new(file_name, 10)
+            .await
+            .expect("Error when creating the reading pool");
+
+        let rocket = rocket::Rocket::build()
+            .manage(read_pool)
+            .manage(write_pool)
+            .manage(Highlighter::new())
+            .manage(
+                serde_json::from_str::<BibinConfig>(
+                    &(r#"{ "password_hash": ""#.to_string()
+                        + PASSWORD_HASH
+                        + r#"", "prefix": "/" }"#),
+                )
+                .unwrap(),
+            )
+            .mount(
+                "/",
+                routes![
+                    index,
+                    all_entries,
+                    get_qr,
+                    get_item,
+                    get_item_raw,
+                    delete,
+                    submit,
+                    submit_raw,
+                    submit_raw_with_key
+                ],
+            );
+        // the NamedTempFile will be deleted when `temp` goes out of scope. We need
+        // to hand it over to the tests so that it stays on the fs until the end of the test
+        (temp, Client::untracked(rocket).await.unwrap())
+    }
+}

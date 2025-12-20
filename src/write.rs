@@ -20,7 +20,7 @@ pub async fn submit(
     pool: &State<WritePool>,
 ) -> Result<Redirect, Status> {
     let form_data = input.into_inner();
-    if !form_data.password.is_valid(&config.password) {
+    if !form_data.password.is_valid(&config.password_hash) {
         Err(Status::Unauthorized)
     } else {
         match store_paste(pool, config.id_length, config.max_entries, form_data.val).await {
@@ -44,7 +44,7 @@ pub async fn submit_with_key(
     key: String,
 ) -> Result<Redirect, Status> {
     let form_data = input.into_inner();
-    if !form_data.password.is_valid(&config.password) {
+    if !form_data.password.is_valid(&config.password_hash) {
         Err(Status::Unauthorized)
     } else {
         match store_paste_given_id(pool, key, form_data.val).await {
@@ -67,7 +67,7 @@ pub async fn submit_raw(
     password: auth::AuthKey,
     pool: &State<WritePool>,
 ) -> Result<String, Status> {
-    if !password.is_valid(&config.password) {
+    if !password.is_valid(&config.password_hash) {
         return Err(Status::Unauthorized);
     }
 
@@ -98,7 +98,7 @@ pub async fn submit_raw_with_key(
     pool: &State<WritePool>,
     key: String,
 ) -> Result<String, Status> {
-    if !password.is_valid(&config.password) {
+    if !password.is_valid(&config.password_hash) {
         return Err(Status::Unauthorized);
     }
 
@@ -128,7 +128,7 @@ pub async fn delete(
     password: auth::AuthKey,
     pool: &State<WritePool>,
 ) -> Result<String, Status> {
-    if !password.is_valid(&config.password) {
+    if !password.is_valid(&config.password_hash) {
         return Err(Status::Unauthorized);
     }
 
