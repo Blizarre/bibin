@@ -22,7 +22,3 @@ sqlx = { version = "0.8", features = ['runtime-tokio-rustls', 'sqlite'] }
 tempfile = "3.14.0"
 argon2 = "0.5.3"
 
-[profile.release]
-lto = true
-codegen-units = 1
-incremental = false
