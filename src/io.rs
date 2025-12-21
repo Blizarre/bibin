@@ -1,6 +1,6 @@
 extern crate rand;
 
-use rand::{thread_rng, Rng};
+use rand::{rng, Rng};
 
 use std::time::Duration;
 
@@ -69,7 +69,7 @@ fn generate_id(length: usize) -> String {
     const CHARSET: &[u8] = b"abcdefghjkmnpqrstwxyz23456789";
     (0..length)
         .map(|_| {
-            let idx = thread_rng().gen_range(0..CHARSET.len());
+            let idx = rng().random_range(0..CHARSET.len());
             CHARSET[idx] as char
         })
         .collect::<String>()

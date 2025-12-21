@@ -10,10 +10,9 @@ use rocket::http::{RawStr, Status};
 use rocket::response::content::RawJson;
 use rocket::response::Redirect;
 use rocket::State;
-use std::borrow::Cow;
 use std::collections::HashMap;
 
-use askama::{Html as AskamaHtml, MarkupDisplay, Template};
+use askama::Template;
 
 ///
 /// Show paste page
@@ -26,7 +25,7 @@ pub struct PngResponder(Vec<u8>);
 #[derive(Template)]
 #[template(path = "paste.html")]
 struct ShowPaste<'a> {
-    content: MarkupDisplay<AskamaHtml, Cow<'a, String>>,
+    content: &'a str,
 }
 
 #[derive(Template)]
@@ -188,9 +187,7 @@ pub async fn get_item(
             code_highlighted.replace('\n', "</code><code>")
         );
 
-        let content = MarkupDisplay::new_safe(Cow::Borrowed(&html), AskamaHtml);
-
-        let template = ShowPaste { content };
+        let template = ShowPaste { content: &html };
         match template.render() {
             Ok(html) => Ok(RedirectOrContent::Html(html)),
             Err(_) => Err(Status::InternalServerError),
