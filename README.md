@@ -34,7 +34,7 @@ database_file=":memory:"    # Sqlite file on disk or ":memory:"
 
 Override values from `Rocket.toml` with environment variables:
 ```
-$ ROCKET_PREFIX="https://bi.bin" ROCKET_PASSWORD=bibinrulez ROCKET_ID_LENGTH=6 ./bibin
+$ ROCKET_PREFIX="https://bi.bin" ROCKET_PASSWORD_HASH=<value from bibin_pwd_hash> ROCKET_ID_LENGTH=6 ./bibin
 ```
 
 ### Curl support
