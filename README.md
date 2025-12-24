@@ -6,6 +6,8 @@ A (heavily modified) fork of the excellent [bin](https://github.com/w4/bin) that
 
 It is optimized for speed and can handle hundreds of clients per second (async code with [Rocket](https://rocket.rs/)/[SQLx](https://github.com/launchbadge/sqlx)).
 
+The docker image is built using the official [Docker Hardened images](https://dhi.io/). User ID/Group ID: 65532/65532.
+
 ### Persistence
 
 The entries are stored in a Sqlite database file defined by the `database_file` configuration key. To disable persistance and use an in-memory keystore, use the special file `:memory:`.
