@@ -229,6 +229,8 @@ impl From<sqlx::error::Error> for IOError {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashSet;
+
     use super::*;
 
     #[async_test]
@@ -257,5 +259,28 @@ mod tests {
         assert!(delete_paste(&write_pool, &id).await.is_err());
         assert!(get_paste(&read_pool, &id).await.unwrap().is_none());
         assert_eq!(get_all_paste(&read_pool).await.unwrap(), vec![]);
+    }
+
+    #[test]
+    fn test_generate_id_len() {
+        for len in 1..20 {
+            let test_id = generate_id(len);
+            assert!(test_id.len() == len);
+            for forbidden in "i1luv".chars() {
+                assert!(!test_id.contains(forbidden));
+            }
+        }
+    }
+
+    #[test]
+    fn test_generate_id_various_chars() {
+        // Just a small check that we use several chars in the output (at least 5 here). Very naive
+        // but that's a smoketest.
+        // (29 chars - 5)^100 / (29 chars)^100 = 6 * 10e-7 % of false positive.
+        // This test shouldn't be too flaky :p
+        let test_id = generate_id(100);
+        assert!(test_id.len() == 100);
+        let vector = test_id.chars().collect::<HashSet<_>>();
+        assert!(vector.len() > 5);
     }
 }
