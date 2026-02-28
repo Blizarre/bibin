@@ -143,7 +143,7 @@ pub async fn store_paste(
 
     let mut retries = 0;
     let max_retries = 20;
-    while retries < max_entries {
+    while retries < max_retries {
         warn!("Another ID Collision: {}/{}", retries, max_retries);
         let id = generate_id(id_length);
         let result = cnx
@@ -164,7 +164,7 @@ pub async fn store_paste(
     let id = generate_id(id_length);
     cnx.execute(
         sqlx::query("INSERT INTO entries (id, data) VALUES (?, ?)")
-            .bind(generate_id(id_length))
+            .bind(&id)
             .bind(&content),
     )
     .await?;
